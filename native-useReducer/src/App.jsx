@@ -1,7 +1,7 @@
 import { useReducer } from "react";
 import "./App.css";
 
-function App() {
+function NameList() {
   const [state, dispatch] = useReducer(
     (state, action) => {
       switch (action.type) {
@@ -37,6 +37,49 @@ function App() {
           <li key={index}>{name}</li>
         ))}
       </ul>
+    </div>
+  );
+}
+
+function UserForm() {
+  const [state, dispatch] = useReducer(
+    (state, action) => {
+      // no need to use switch case, just send
+      // the state key and value to update directly
+      // without mentinoing type and payload in dispatch call
+      return { ...state, ...action };
+    },
+    {
+      first: "",
+      last: "",
+    }
+  );
+
+  return (
+    <div>
+      <input
+        type="text"
+        value={state.first}
+        onChange={(e) => dispatch({ first: e.target.value })}
+      />
+      <input
+        type="text"
+        value={state.last}
+        onChange={(e) => dispatch({ last: e.target.value })}
+      />
+      <h3>
+        {state.first} {state.last}
+      </h3>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <div className="App">
+      <UserForm />
+      <br />
+      <NameList />
     </div>
   );
 }
