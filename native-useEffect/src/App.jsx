@@ -1,6 +1,26 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 
+const StopWatch = () => {
+  const [time, setTime] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTime((oldTime) => oldTime + 1);
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  return (
+    <>
+      <div>Time: {time} </div>
+    </>
+  );
+};
+
 function App() {
   const [names, setNames] = useState([]);
 
@@ -20,6 +40,7 @@ function App() {
 
   return (
     <div>
+      <StopWatch />
       <div>
         {names.map((name) => (
           <button key={name} onClick={() => onSelectedNameChange(name)}>
