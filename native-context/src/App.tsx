@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext, createContext } from "react";
 import "./App.css";
 
 interface Pokemon {
@@ -23,7 +23,8 @@ function usePokemon(): { pokemon: Pokemon[] } {
   return { pokemon };
 }
 
-const PokemonList = ({ pokemon }: { pokemon: Pokemon[] }) => {
+const PokemonList = () => {
+  const { pokemon } = useContext(PokemonContext);
   return (
     <div>
       {pokemon.map((p) => (
@@ -33,13 +34,17 @@ const PokemonList = ({ pokemon }: { pokemon: Pokemon[] }) => {
   );
 };
 
+const PokemonContext = createContext({
+  pokemon: [] as Pokemon[],
+});
+
 function App() {
-  const { pokemon } = usePokemon();
   return (
     <div className="App">
       <h1>Pokemon</h1>
-      {/* {JSON.stringify(pokemon)} */}
-      <PokemonList pokemon={pokemon} />
+      <PokemonContext.Provider value={usePokemon()}>
+        <PokemonList />
+      </PokemonContext.Provider>
     </div>
   );
 }
