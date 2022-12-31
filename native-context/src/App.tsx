@@ -1,13 +1,47 @@
-import { useState } from 'react'
-import './App.css'
+import { useState, useEffect } from "react";
+import "./App.css";
 
-function App() {
+interface Pokemon {
+  id: number;
+  name: string;
+  type: string[];
+  hp: number;
+  attack: number;
+  defense: number;
+  special_attack: number;
+  special_defense: number;
+  speed: number;
+}
+function usePokemon(): { pokemon: Pokemon[] } {
+  const [pokemon, setPokemon] = useState<Pokemon[]>([]);
 
-  return (
-    <div className="App">
-      hello world
-    </div>
-  )
+  useEffect(() => {
+    fetch("/pokemon.json")
+      .then((res) => res.json())
+      .then((data) => setPokemon(data));
+  }, []);
+  return { pokemon };
 }
 
-export default App
+const PokemonList = ({ pokemon }: { pokemon: Pokemon[] }) => {
+  return (
+    <div>
+      {pokemon.map((p) => (
+        <div key={p.id}>{p.name}</div>
+      ))}
+    </div>
+  );
+};
+
+function App() {
+  const { pokemon } = usePokemon();
+  return (
+    <div className="App">
+      <h1>Pokemon</h1>
+      {/* {JSON.stringify(pokemon)} */}
+      <PokemonList pokemon={pokemon} />
+    </div>
+  );
+}
+
+export default App;
