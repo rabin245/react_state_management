@@ -12,7 +12,7 @@ interface Pokemon {
   special_defense: number;
   speed: number;
 }
-function usePokemon(): { pokemon: Pokemon[] } {
+function usePokemonSource(): { pokemon: Pokemon[] } {
   const [pokemon, setPokemon] = useState<Pokemon[]>([]);
 
   useEffect(() => {
@@ -23,8 +23,15 @@ function usePokemon(): { pokemon: Pokemon[] } {
   return { pokemon };
 }
 
+const PokemonContext = createContext<ReturnType<typeof usePokemonSource>>(
+  {} as unknown as ReturnType<typeof usePokemonSource>
+);
+
+function usePokemon() {
+  return useContext(PokemonContext);
+}
 const PokemonList = () => {
-  const { pokemon } = useContext(PokemonContext);
+  const { pokemon } = usePokemon();
   return (
     <div>
       {pokemon.map((p) => (
@@ -34,15 +41,11 @@ const PokemonList = () => {
   );
 };
 
-const PokemonContext = createContext({
-  pokemon: [] as Pokemon[],
-});
-
 function App() {
   return (
     <div className="App">
       <h1>Pokemon</h1>
-      <PokemonContext.Provider value={usePokemon()}>
+      <PokemonContext.Provider value={usePokemonSource()}>
         <PokemonList />
       </PokemonContext.Provider>
     </div>
