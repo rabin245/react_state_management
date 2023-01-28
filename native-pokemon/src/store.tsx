@@ -1,5 +1,11 @@
-import React, { useState, useEffect, useContext, createContext } from "react";
-import "./App.css";
+import React, {
+  useMemo,
+  useEffect,
+  useContext,
+  createContext,
+  useReducer,
+  useCallback,
+} from "react";
 
 interface Pokemon {
   id: number;
@@ -12,15 +18,55 @@ interface Pokemon {
   special_defense: number;
   speed: number;
 }
-function usePokemonSource(): { pokemon: Pokemon[] } {
-  const [pokemon, setPokemon] = useState<Pokemon[]>([]);
+function usePokemonSource(): {
+  pokemon: Pokemon[];
+  search: string;
+  setSearch: (search: string) => void;
+} {
+  type PokemonState = {
+    pokemon: Pokemon[];
+    search: string;
+  };
+  type PokemonAction =
+    | { type: "setPokemon"; payload: Pokemon[] }
+    | { type: "setSearch"; payload: string };
+  const [{ pokemon, search }, dispatch] = useReducer(
+    (state: PokemonState, action: PokemonAction) => {
+      switch (action.type) {
+        case "setPokemon":
+          return { ...state, pokemon: action.payload };
+        case "setSearch":
+          return { ...state, search: action.payload };
+      }
+    },
+    {
+      pokemon: [],
+      search: "",
+    }
+  );
 
   useEffect(() => {
     fetch("/pokemon.json")
       .then((res) => res.json())
-      .then((data) => setPokemon(data));
+      .then((data) => dispatch({ type: "setPokemon", payload: data }));
   }, []);
-  return { pokemon };
+
+  const setSearch = useCallback((search: string) => {
+    dispatch({ type: "setSearch", payload: search });
+  }, []);
+
+  const filteredPokemon = useMemo(() => {
+    return pokemon
+      .filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
+      .slice(0, 20);
+  }, [pokemon, search]);
+
+  const sortedPokemon = useMemo(
+    () => [...filteredPokemon].sort((a, b) => a.name.localeCompare(b.name)),
+    [filteredPokemon]
+  );
+
+  return { pokemon: sortedPokemon, search, setSearch };
 }
 
 const PokemonContext = createContext<ReturnType<typeof usePokemonSource>>(
@@ -34,6 +80,7 @@ export function PokemonProvider({ children }: { children: React.ReactNode }) {
     </PokemonContext.Provider>
   );
 }
+
 export function usePokemon() {
   return useContext(PokemonContext);
 }
