@@ -1,18 +1,27 @@
+import { useSnapshot } from "valtio";
+import { search, pokemon } from "./store";
+
 function SearchBox() {
+  const snap = useSnapshot(search);
+
   return (
     <input
       className="mt-3 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-800 focus:ring-indigo-800 sm:text-lg p-2"
       placeholder="Search"
-      value={""}
-      onChange={() => {}}
+      value={snap.query}
+      onChange={(e) => {
+        search.query = e.target.value;
+      }}
     />
   );
 }
 
 const PokemonList = () => {
+  const snap = useSnapshot(pokemon);
+
   return (
     <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-3">
-      {[].map((p) => (
+      {snap.list.map((p) => (
         <li
           key={p.id}
           className="col-span-1 flex flex-col text-center bg-white rounded-lg shadow divide-y divide-gray-200"
