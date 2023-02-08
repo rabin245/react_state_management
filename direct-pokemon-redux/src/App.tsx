@@ -1,18 +1,47 @@
+import { useMemo } from "react";
+import { useSelector, useDispatch, Provider } from "react-redux";
+import {
+  selectPokemon,
+  selectSearch,
+  setSearch,
+  store,
+  usePokemonQuery,
+} from "./store";
+
 function SearchBox() {
+  const dispatch = useDispatch();
+  const search = useSelector(selectSearch);
+
   return (
     <input
       className="mt-3 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-800 focus:ring-indigo-800 sm:text-lg p-2"
       placeholder="Search"
-      value={""}
-      onChange={() => {}}
+      value={search}
+      onChange={(e) => {
+        dispatch(setSearch(e.target.value));
+      }}
     />
   );
 }
 
 const PokemonList = () => {
+  // const { data } = usePokemonQuery(undefined);
+  // const filteredAndSortedPokemon = useMemo(() => {
+  //   return (data || [])
+  //     .filter((pokemon) => {
+  //       return pokemon.name.toLowerCase().includes(search.toLowerCase());
+  //     })
+  //     .slice(0, 10)
+  //     .sort((a, b) => {
+  //       return a.name.localeCompare(b.name);
+  //     });
+  // }, [data, search]);
+
+  const pokemon = useSelector(selectPokemon);
+
   return (
     <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mt-3">
-      {[].map((p) => (
+      {pokemon.map((p) => (
         <li
           key={p.id}
           className="col-span-1 flex flex-col text-center bg-white rounded-lg shadow divide-y divide-gray-200"
@@ -33,10 +62,12 @@ const PokemonList = () => {
 
 function App() {
   return (
-    <div className="mx-auto max-w-3xl">
-      <SearchBox />
-      <PokemonList />
-    </div>
+    <Provider store={store}>
+      <div className="mx-auto max-w-3xl">
+        <SearchBox />
+        <PokemonList />
+      </div>
+    </Provider>
   );
 }
 
